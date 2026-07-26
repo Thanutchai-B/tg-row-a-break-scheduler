@@ -41,11 +41,11 @@
   }
   .wrap{max-width:1400px;margin:0 auto;}
 
-  /* ---------- Header / signature split-flap board ---------- */
+  /* ---------- Header ---------- */
   header{
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    justify-space:between;
     flex-wrap:wrap;
     gap:14px;
     margin-bottom:22px;
@@ -132,6 +132,34 @@
   .legend .sw{display:inline-flex;align-items:center;gap:6px;}
   .legend .box{width:16px;height:16px;border-radius:3px;display:inline-block;border:1px solid rgba(255,255,255,.15);}
 
+  /* ---------- Toolbar: column toggle & zoom controls ---------- */
+  .grid-toolbar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    margin-bottom:10px;padding:8px 12px;background:var(--navy-800);border-radius:8px;
+    font-size:11.5px;color:var(--text-mid);
+  }
+  .grid-toolbar .ctl{display:flex;align-items:center;gap:8px;}
+  .toggle-btn{
+    font-family:'IBM Plex Sans Thai',sans-serif;
+    font-size:12px;font-weight:500;
+    padding:6px 14px;border-radius:6px;
+    border:1px solid var(--navy-600);
+    background:var(--navy-900);
+    color:var(--text-hi);
+    cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:all .15s ease;
+  }
+  .toggle-btn:hover{border-color:var(--amber);color:var(--amber-soft);}
+  .toggle-btn.active{
+    background:rgba(232,163,61,.18);
+    border-color:var(--amber);
+    color:var(--amber-soft);
+    font-weight:600;
+  }
+  .grid-toolbar input[type=range]{width:110px;accent-color:var(--amber);}
+  .grid-toolbar .val{font-family:'Space Mono',monospace;color:var(--amber-soft);min-width:38px;text-align:center;}
+
   /* ---------- Schedule grid ---------- */
   .grid-scroll{overflow-x:auto;border-radius:8px;border:1px solid var(--navy-700);}
   table.schedule{border-collapse:collapse;font-size:11.5px;min-width:100%;}
@@ -173,13 +201,6 @@
     padding:8px 3px;
     width:30px;
   }
-  thead tr.hour-row th{
-    background:var(--navy-800);
-    color:var(--text-dim);
-    font-size:10px;
-    padding:3px;
-    font-family:'Space Mono',monospace;
-  }
   tbody tr:hover td:not(.name-col){filter:brightness(1.15);}
   .emp-name{font-weight:600;font-size:13.5px;color:var(--text-hi);line-height:1.3;}
   .emp-shift{font-size:11px;color:var(--text-dim);font-family:'Space Mono',monospace;}
@@ -208,32 +229,11 @@
   .tot-label{font-size:10.5px;color:var(--text-dim);font-family:'Space Mono',monospace;}
   .tot-label b{color:var(--text-hi);}
 
+  /* Hide columns rule */
+  table.schedule.hide-name-col .name-col { display: none !important; }
+  table.schedule.hide-tot-col .totcol { display: none !important; }
+
   .grid-scroll{zoom:var(--grid-zoom, 1);}
-
-  td.cell.clockout{
-    width:14px;background:var(--navy-950);border-left:2px solid var(--amber);
-    color:var(--amber-soft);font-size:8px;cursor:default;
-  }
-  th.col-boundary{
-    width:14px;background:var(--navy-950);color:var(--amber-soft);
-    border-left:2px solid var(--amber);font-size:9px;
-  }
-
-  /* ---------- Toolbar: column & zoom controls ---------- */
-  .grid-toolbar{
-    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
-    margin-bottom:10px;padding:8px 10px;background:var(--navy-800);border-radius:8px;
-    font-size:11.5px;color:var(--text-mid);
-  }
-  .grid-toolbar .ctl{display:flex;align-items:center;gap:6px;}
-  .stepper{
-    width:24px;height:24px;border-radius:5px;border:1px solid var(--navy-600);
-    background:var(--navy-900);color:var(--text-hi);cursor:pointer;font-size:14px;
-    display:flex;align-items:center;justify-content:center;line-height:1;
-  }
-  .stepper:hover{border-color:var(--amber);color:var(--amber-soft);}
-  .grid-toolbar input[type=range]{width:110px;accent-color:var(--amber);}
-  .grid-toolbar .val{font-family:'Space Mono',monospace;color:var(--amber-soft);min-width:38px;text-align:center;}
 
   /* ---------- Collapsible panel sections ---------- */
   .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;cursor:pointer;}
@@ -312,17 +312,13 @@
     <h2>2. ตารางพัก <span>คลิกที่ช่องเพื่อสลับสถานะด้วยตนเอง — พัก / ทำงาน / ลุกเคาน์เตอร์</span></h2>
     <div class="grid-toolbar">
       <div class="ctl">
-        <span>คอลัมน์ชื่อ</span>
-        <button type="button" class="stepper" id="nameColMinus">−</button>
-        <button type="button" class="stepper" id="nameColPlus">+</button>
+        <button type="button" class="toggle-btn" id="toggleNameColBtn">👁 ซ่อนคอลัมน์ชื่อ</button>
       </div>
       <div class="ctl">
-        <span>คอลัมน์สรุป</span>
-        <button type="button" class="stepper" id="totColMinus">−</button>
-        <button type="button" class="stepper" id="totColPlus">+</button>
+        <button type="button" class="toggle-btn" id="toggleTotColBtn">👁 ซ่อนคอลัมน์สรุป</button>
       </div>
-      <div class="ctl">
-        <span>ขนาดตาราง (พอดีหน้าจอ)</span>
+      <div class="ctl" style="margin-left:auto;">
+        <span>ขนาดตาราง</span>
         <input type="range" id="zoomSlider" min="40" max="150" step="5" value="100">
         <span class="val" id="zoomLabel">100%</span>
       </div>
@@ -349,7 +345,7 @@
     </div>
   </div>
 
-  <footer>เงื่อนไข — ≤8ชม. พัก 1.5ชม. / &gt;8ชม. พัก 2.5ชม. (พักติดต่อกันครั้งละอย่างน้อย 1 ชม.) · ลุกเคาน์เตอร์ 30 นาทีก่อนเลิกงานเสมอ (บวกเพิ่ม) · อย่างน้อย 6 คนต่อเคาน์เตอร์ทุกชั่วโมง · แต่ละรอบทำงานต่อเนื่อง 1–3 ชม.<br>ข้อมูลจะถูกบันทึกไว้ในเบราว์เซอร์นี้โดยอัตโนมัติ — เปิดแอพซ้ำบนอุปกรณ์เดียวกันแล้วข้อมูลจะยังอยู่</footer>
+  <footer>เงื่อนไข — ≤8ชม. พัก 1.5ชม. / &gt;8ชม. พัก 2.5ชม. (พักติดต่อกันครั้งละอย่างน้อย 1 ชม.) · ลุกเคาน์เตอร์ 30 นาทีก่อนเลิกงานเสมอ · อย่างน้อย 6 คนต่อเคาน์เตอร์ทุกชั่วโมง · แต่ละรอบทำงานต่อเนื่อง 1–3 ชม.<br>ข้อมูลจะถูกบันทึกไว้ในเบราว์เซอร์นี้โดยอัตโนมัติ — เปิดแอพซ้ำบนอุปกรณ์เดียวกันแล้วข้อมูลจะยังอยู่</footer>
 </div>
 
 <script>
@@ -376,7 +372,7 @@ function saveState(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(employees));
   }catch(err){
-    storageOk = false; // storage unavailable (e.g. private mode) — fail silently, keep app usable
+    storageOk = false;
   }
 }
 function loadState(){
@@ -401,9 +397,9 @@ function loadState(){
   }
 }
 
-// ---------------- UI preferences (column widths / zoom / panel collapse) ----------------
-const UI_KEY = 'tgRowA_ui_v1';
-let uiPrefs = { nameColW:210, totColW:150, zoom:100, inputCollapsed:false, warnCollapsed:false };
+// ---------------- UI preferences (column toggles / zoom / panel collapse) ----------------
+const UI_KEY = 'tgRowA_ui_v2';
+let uiPrefs = { hideNameCol: false, hideTotCol: false, zoom:100, inputCollapsed:false, warnCollapsed:false };
 function loadUiPrefs(){
   try{
     const raw = localStorage.getItem(UI_KEY);
@@ -414,13 +410,28 @@ function saveUiPrefs(){
   try{ localStorage.setItem(UI_KEY, JSON.stringify(uiPrefs)); }catch(err){}
 }
 function applyUiPrefs(){
-  document.documentElement.style.setProperty('--namecol-w', uiPrefs.nameColW+'px');
-  document.documentElement.style.setProperty('--totcol-w', uiPrefs.totColW+'px');
+  const table = document.getElementById('scheduleTable');
+  if(table){
+    table.classList.toggle('hide-name-col', !!uiPrefs.hideNameCol);
+    table.classList.toggle('hide-tot-col', !!uiPrefs.hideTotCol);
+  }
+  const nameBtn = document.getElementById('toggleNameColBtn');
+  if(nameBtn){
+    nameBtn.classList.toggle('active', !!uiPrefs.hideNameCol);
+    nameBtn.innerHTML = uiPrefs.hideNameCol ? '👁 แสดงคอลัมน์ชื่อ' : '👁 ซ่อนคอลัมน์ชื่อ';
+  }
+  const totBtn = document.getElementById('toggleTotColBtn');
+  if(totBtn){
+    totBtn.classList.toggle('active', !!uiPrefs.hideTotCol);
+    totBtn.innerHTML = uiPrefs.hideTotCol ? '👁 แสดงคอลัมน์สรุป' : '👁 ซ่อนคอลัมน์สรุป';
+  }
+
   document.documentElement.style.setProperty('--grid-zoom', uiPrefs.zoom/100);
   const slider = document.getElementById('zoomSlider');
   const label = document.getElementById('zoomLabel');
   if(slider) slider.value = uiPrefs.zoom;
   if(label) label.textContent = uiPrefs.zoom+'%';
+
   const inputBody = document.getElementById('inputPanelBody');
   const warnBody = document.getElementById('warnPanelBody');
   const inputBtn = document.getElementById('inputCollapseBtn');
@@ -432,17 +443,13 @@ function applyUiPrefs(){
 }
 
 function wireToolbar(){
-  document.getElementById('nameColMinus').addEventListener('click', ()=>{
-    uiPrefs.nameColW = Math.max(100, uiPrefs.nameColW-20); applyUiPrefs(); saveUiPrefs();
+  document.getElementById('toggleNameColBtn').addEventListener('click', ()=>{
+    uiPrefs.hideNameCol = !uiPrefs.hideNameCol;
+    applyUiPrefs(); saveUiPrefs();
   });
-  document.getElementById('nameColPlus').addEventListener('click', ()=>{
-    uiPrefs.nameColW = Math.min(320, uiPrefs.nameColW+20); applyUiPrefs(); saveUiPrefs();
-  });
-  document.getElementById('totColMinus').addEventListener('click', ()=>{
-    uiPrefs.totColW = Math.max(80, uiPrefs.totColW-20); applyUiPrefs(); saveUiPrefs();
-  });
-  document.getElementById('totColPlus').addEventListener('click', ()=>{
-    uiPrefs.totColW = Math.min(280, uiPrefs.totColW+20); applyUiPrefs(); saveUiPrefs();
+  document.getElementById('toggleTotColBtn').addEventListener('click', ()=>{
+    uiPrefs.hideTotCol = !uiPrefs.hideTotCol;
+    applyUiPrefs(); saveUiPrefs();
   });
   document.getElementById('zoomSlider').addEventListener('input', (ev)=>{
     uiPrefs.zoom = +ev.target.value; applyUiPrefs(); saveUiPrefs();
@@ -458,9 +465,6 @@ function wireToolbar(){
 }
 
 // ---------------- Input table render ----------------
-// Built ONCE — inputs are never destroyed/recreated while the user is
-// interacting with them (this was causing the native time-picker to
-// snap shut on iOS). Only the small derived-text cells get updated live.
 function deriveShiftText(e){
   const shiftMin = (toMin(e.end)!=null && toMin(e.start)!=null && toMin(e.end)>toMin(e.start)) ? (toMin(e.end)-toMin(e.start)) : null;
   const shiftHrs = shiftMin!=null ? (shiftMin/60).toFixed(1) : '—';
@@ -517,10 +521,8 @@ function updateInputRowDerived(idx){
 }
 
 // ---------------- Scheduling algorithm ----------------
-// Breaks are now placed as CONTIGUOUS blocks of >=2 slots (>=1h) each,
-// per the requirement that every break session must be at least 1h continuous.
 function computeBlockLengths(breakSlots){
-  if(breakSlots < 4) return [breakSlots]; // can't split into 2 blocks of >=1h each
+  if(breakSlots < 4) return [breakSlots];
   let a = Math.ceil(breakSlots/2), b = breakSlots - a;
   if(b < 2){ a = breakSlots - 2; b = 2; }
   return [a, b];
@@ -534,10 +536,8 @@ function placeBlocks(N, blocks, phaseSlots){
   for(let i=0;i<segCount;i++){
     segLens.push(Math.round(totalWork*(i+1)/segCount) - Math.round(totalWork*i/segCount));
   }
-  // stagger break timing across employees by shifting slots from the last segment into the first
   segLens[0] += phaseSlots;
   segLens[segLens.length-1] -= phaseSlots;
-  // clamp every segment into [MIN_GAP, MAX_GAP] (1h–3h continuous work), redistributing as needed
   for(let iter=0; iter<80; iter++){
     let changed=false;
     for(let i=0;i<segLens.length;i++){
@@ -562,7 +562,7 @@ function placeBlocks(N, blocks, phaseSlots){
     ranges.push({start:cursor, len:blocks[i]});
     cursor+=blocks[i];
   }
-  return ranges; // [{start:slotIndex, len:numSlots}, ...] each block len>=2 (>=1h)
+  return ranges;
 }
 
 function segmentsValid(N, ranges){
@@ -582,10 +582,9 @@ function computeEmployeeBreakBlocks(start, end, phaseSlots){
   const breakTotal = shiftMin <= 480 ? 90 : 150;
   const breakSlotsCount = breakTotal / 30;
   const blocks = computeBlockLengths(breakSlotsCount);
-  const leaveSlotStart = end - 30;
-  const N = (leaveSlotStart - start) / SLOT;
+  const N = ((end - start) / SLOT) - 1; // 1 slot reserved for leave at `end`
   const ranges = placeBlocks(N, blocks, phaseSlots);
-  return { ranges, N, leaveSlotStart, breakTotal, start };
+  return { ranges, N, breakTotal, start, end };
 }
 
 function rangesToTimes(r){
@@ -598,10 +597,10 @@ function autoSchedule(){
   const active = employees.filter(e=>e.active && e.start && e.end && toMin(e.end)>toMin(e.start));
   if(active.length===0){ alert('กรุณาใส่เวลาเข้า-ออกงานอย่างน้อย 1 คน'); return; }
 
-  const results = {}; // id -> {start,end,ranges,N,leaveSlotStart,breakTotal}
+  const results = {};
   active.forEach((e,i)=>{
     const start = toMin(e.start), end = toMin(e.end);
-    const phaseSlots = (i%4) - 1; // staggers break timing across employees
+    const phaseSlots = (i%4) - 1;
     const r = computeEmployeeBreakBlocks(start, end, phaseSlots);
     results[e.id] = {start, end, ...r};
   });
@@ -615,16 +614,13 @@ function autoSchedule(){
       if(e.id===excludeId) return;
       const r = results[e.id];
       if(t>=r.start && t<r.end){
-        const onBreak = rangesToTimes(r).includes(t) || t===r.leaveSlotStart;
+        const onBreak = rangesToTimes(r).includes(t);
         if(!onBreak) w++;
       }
     });
     return w;
   }
 
-  // Repair pass: try every understaffed slot (worst first), moving whole break
-  // BLOCKS (never splitting them) to reduce deficits. Slots whose only occupants
-  // are on the fixed mandatory leave-counter slot can't be fixed and are skipped.
   for(let iter=0; iter<1000; iter++){
     let slotsDeficit = [];
     for(let t=globalMin; t<globalMax; t+=SLOT){
@@ -644,7 +640,7 @@ function autoSchedule(){
         if(!(worstSlot>=r.start && worstSlot<r.end)) continue;
         const idxSlot = (worstSlot-r.start)/SLOT;
         const blockIdx = r.ranges.findIndex(rg=>idxSlot>=rg.start && idxSlot<rg.start+rg.len);
-        if(blockIdx===-1) continue; // on mandatory leave slot or already working — not movable
+        if(blockIdx===-1) continue;
 
         const backup = r.ranges.map(rg=>({...rg}));
         let bestDelta=null, bestScore=-1;
@@ -659,7 +655,7 @@ function autoSchedule(){
           if(!segmentsValid(r.N, trial)) continue;
           const newBlockStartT = r.start + trial[blockIdx].start*SLOT;
           const newBlockEndT = newBlockStartT + trial[blockIdx].len*SLOT;
-          if(worstSlot>=newBlockStartT && worstSlot<newBlockEndT) continue; // still covers it — no help
+          if(worstSlot>=newBlockStartT && worstSlot<newBlockEndT) continue;
           let minWork = Infinity;
           for(let i=0;i<trial[blockIdx].len;i++){
             minWork = Math.min(minWork, workingCount(newBlockStartT+i*SLOT, e.id));
@@ -677,15 +673,15 @@ function autoSchedule(){
     if(!movedAny) break;
   }
 
-  // write back into employees[].cells
+  // Write back into employees[].cells
   employees.forEach(e=>{ e.cells = {}; });
   active.forEach(e=>{
     const r = results[e.id];
     const times = rangesToTimes(r);
-    for(let t=r.start; t<r.leaveSlotStart; t+=SLOT){
+    for(let t=r.start; t<r.end; t+=SLOT){
       e.cells[t] = times.includes(t) ? 'brk' : 'work';
     }
-    e.cells[r.leaveSlotStart] = 'leave';
+    e.cells[r.end] = 'leave'; // ลุกเคาน์เตอร์แสดงที่เวลา end พอดี
   });
 
   document.getElementById('statusChip').textContent = 'จัดตารางแล้ว · แก้ไขเพิ่มเติมได้';
@@ -699,8 +695,8 @@ function getGlobalRange(){
   if(active.length===0) return null;
   let min = Math.min(...active.map(e=>toMin(e.start)));
   let max = Math.max(...active.map(e=>toMin(e.end)));
-  min = Math.floor(min/60)*60; // round down to hour
-  max = Math.ceil(max/60)*60;  // round up to hour
+  min = Math.floor(min/60)*60;
+  max = Math.ceil(max/60)*60;
   return {min,max};
 }
 
@@ -709,16 +705,11 @@ function renderSchedule(){
   const range = getGlobalRange();
   if(!range){ table.innerHTML = '<tr><td style="padding:20px;color:var(--text-dim)">ใส่เวลาเข้า-ออกงานแล้วกด "จัดตารางพักอัตโนมัติ"</td></tr>'; renderWarnings(); return; }
 
-  // working slots (30-min intervals) + one extra boundary marker at the very end
-  // so the timeline visibly reaches the last clock-out time (e.g. 15:00), not
-  // just the start of the last half-hour interval (14:30).
   const slots = [];
-  for(let t=range.min; t<range.max; t+=SLOT) slots.push(t);
-  const boundaryT = range.max;
+  for(let t=range.min; t<=range.max; t+=SLOT) slots.push(t);
 
   let html = '<thead><tr class="time-row"><th class="name-col">พนักงาน</th>';
   slots.forEach(t=>{ html += `<th class="${t%60===0?'col-hour-start':''}">${fmt(t)}</th>`; });
-  html += `<th class="col-boundary" title="เวลาสุดท้าย">${fmt(boundaryT)}</th>`;
   html += '<th class="totcol">สรุป</th></tr></thead><tbody>';
 
   const activeEmployees = employees.filter(e=>e.active && e.start && e.end);
@@ -734,10 +725,11 @@ function renderSchedule(){
       </td>`;
     let brkCount=0, leaveCount=0;
     slots.forEach(t=>{
-      if(t<start || t>=end){
+      if(t<start || t>end){
         html += `<td class="cell off"></td>`;
       } else {
-        const st = e.cells[t] || 'work';
+        const defaultState = (t===end) ? 'leave' : 'work';
+        const st = e.cells[t] || defaultState;
         if(st==='brk') brkCount++;
         if(st==='leave') leaveCount++;
         const cls = st==='brk'?'brk':(st==='leave'?'leave':'work');
@@ -745,12 +737,7 @@ function renderSchedule(){
         html += `<td class="cell ${cls}" data-emp="${e.id}" data-t="${t}">${label}</td>`;
       }
     });
-    // boundary marker cell — shows a clock-out tick exactly under this employee's end time
-    if(end===boundaryT){
-      html += `<td class="cell clockout" title="เลิกงาน ${e.end}">⏹</td>`;
-    } else {
-      html += `<td class="cell off"></td>`;
-    }
+
     const shiftMin = end-start;
     const targetBreak = shiftMin<=480?90:150;
     const actualBreakMin = brkCount*30;
@@ -763,15 +750,16 @@ function renderSchedule(){
     html += '</tr>';
   });
 
-  // summary row: staff working per column
+  // Summary row: staff working per column
   html += `<tr class="sumrow"><td class="name-col">ทำงานที่เคาน์เตอร์</td>`;
   slots.forEach(t=>{
     let working=0, onShift=0;
     activeEmployees.forEach(e=>{
       const start=toMin(e.start), end=toMin(e.end);
-      if(t>=start && t<end){
-        onShift++;
-        const st = e.cells[t] || 'work';
+      if(t>=start && t<=end){
+        if(t<end) onShift++;
+        const defaultState = (t===end) ? 'leave' : 'work';
+        const st = e.cells[t] || defaultState;
         if(st==='work') working++;
       }
     });
@@ -779,16 +767,20 @@ function renderSchedule(){
     const deficit = onShift>0 && working<cap;
     html += `<td class="${deficit?'deficit':''}">${onShift>0?working:'–'}</td>`;
   });
-  html += `<td class="cell off"></td><td class="totcol"></td></tr>`;
+  html += `<td class="totcol"></td></tr>`;
 
   html += '</tbody>';
   table.innerHTML = html;
 
-  table.querySelectorAll('td.cell:not(.off):not(.clockout)').forEach(td=>{
+  applyUiPrefs(); // Ensure column toggle classes are applied to the table
+
+  table.querySelectorAll('td.cell:not(.off)').forEach(td=>{
     td.addEventListener('click', ()=>{
       const id = +td.dataset.emp, t = +td.dataset.t;
       const emp = employees.find(x=>x.id===id);
-      const cur = emp.cells[t] || 'work';
+      const end = toMin(emp.end);
+      const defaultState = (t===end) ? 'leave' : 'work';
+      const cur = emp.cells[t] || defaultState;
       const order = {work:'brk', brk:'leave', leave:'work'};
       emp.cells[t] = order[cur];
       renderSchedule();
@@ -819,7 +811,7 @@ function renderWarnings(){
 
   const msgs = [];
 
-  // 1) staffing per slot
+  // 1) Staffing per slot
   for(let t=range.min; t<range.max; t+=SLOT){
     let working=0, onShift=0;
     activeEmployees.forEach(e=>{
@@ -835,19 +827,21 @@ function renderWarnings(){
     }
   }
 
-  // 2) work-streak per employee (1–3h between breaks) + break-block length (>=1h continuous)
+  // 2) Work-streak per employee (1–3h between breaks) & continuous break length (>=1h)
   activeEmployees.forEach(e=>{
     const start=toMin(e.start), end=toMin(e.end);
-    const leaveSlot = end-30;
     let streakStart = start;
     let brkRunStart = null;
-    for(let t=start; t<=leaveSlot; t+=SLOT){
-      const st = t===leaveSlot ? 'leave' : (e.cells[t]||'work');
+    for(let t=start; t<=end; t+=SLOT){
+      const defaultState = (t===end) ? 'leave' : 'work';
+      const st = e.cells[t] || defaultState;
       const isBreakLike = (st==='brk' || st==='leave');
       if(isBreakLike){
         const streakMin = t - streakStart;
-        if(streakMin < 60) msgs.push(`${e.name} — ทำงานต่อเนื่องเพียง ${(streakMin/60).toFixed(1)} ชม. ก่อนพักช่วง ${fmt(t)} (ควร ≥1 ชม.)`);
-        if(streakMin > 180) msgs.push(`${e.name} — ทำงานต่อเนื่อง ${(streakMin/60).toFixed(1)} ชม. ก่อนพักช่วง ${fmt(t)} (เกิน 3 ชม.)`);
+        if(streakMin > 0){
+          if(streakMin < 60) msgs.push(`${e.name} — ทำงานต่อเนื่องเพียง ${(streakMin/60).toFixed(1)} ชม. ก่อนพักช่วง ${fmt(t)} (ควร ≥1 ชม.)`);
+          if(streakMin > 180) msgs.push(`${e.name} — ทำงานต่อเนื่อง ${(streakMin/60).toFixed(1)} ชม. ก่อนพักช่วง ${fmt(t)} (เกิน 3 ชม.)`);
+        }
         streakStart = t+SLOT;
       }
       if(st==='brk'){
@@ -860,13 +854,9 @@ function renderWarnings(){
         }
       }
     }
-    if(brkRunStart!==null){
-      const runMin = leaveSlot - brkRunStart;
-      if(runMin < 60) msgs.push(`${e.name} — พักติดต่อกันเพียง ${(runMin/60).toFixed(1)} ชม. ช่วง ${fmt(brkRunStart)} (ควรพักติดต่อกันอย่างน้อย 1 ชม.)`);
-    }
   });
 
-  // 3) total break vs target
+  // 3) Total break vs target
   activeEmployees.forEach(e=>{
     const start=toMin(e.start), end=toMin(e.end);
     const shiftMin = end-start;
